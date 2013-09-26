@@ -4,7 +4,7 @@ import sys
 
 #host determines who can connect to server. port determines what channel to listen on
 host = ''
-port = 81
+port = 8885
 
 #variable to control "listening" loop execution
 running = True
@@ -78,7 +78,10 @@ def main():
 							onlineQuery(s)
 						elif information[0:4] == b'/me ':
 							sendAll(s, information[4:], "me")
-				else:                                                           
+						else:
+							s.send(b'Invalid command. Valid commands are: /me and /query')
+				else:
+					s.send(b'\\')
 					userSignoff(s)
 
 	server.close()

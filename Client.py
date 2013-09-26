@@ -7,21 +7,19 @@ import socket
 import threading
 import sys
 
-global running
-running = True
 
 class Send(threading.Thread):
 	def run(self):
-		global running
-		while running:
+		runningSend = True
+		while runningSend:
 			user_input = input()
 			s.send(user_input.encode('utf-8'))
 			if user_input == '\\':
-				running = False
+				runningSend = False
 
 host = 'localhost'
 #host = input("Input host to connect to: ")
-port = 81
+port = 8885
 #port = int(input("Input port to connect on: "))
 
 #create a socket object
@@ -42,9 +40,13 @@ else:
 
 sender = Send()
 sender.start()
-
-while running:
+runningRecv = True
+while runningRecv:
 	data = s.recv(1024)
-	print(str(data)[2:-1])
+	if data == b'\\':
+		runningRecv = False
+	else:
+		print(str(data)[2:-1])
     
 s.close()
+print("See ya later")
