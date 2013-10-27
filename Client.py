@@ -17,9 +17,9 @@ class Send(threading.Thread):
 			if user_input == '\\':
 				runningSend = False
 
-host = 'localhost'
+host = '184.58.11.82'
 #host = input("Input host to connect to: ")
-port = 8885
+port = 32401
 #port = int(input("Input port to connect on: "))
 
 #create a socket object

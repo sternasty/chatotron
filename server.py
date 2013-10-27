@@ -4,7 +4,8 @@ import sys
 
 #host determines who can connect to server. port determines what channel to listen on
 host = ''
-port = 8885
+port = 32401
+originalPort = port
 
 #variable to control "listening" loop execution
 running = True
@@ -19,7 +20,7 @@ while notBound:
 		notBound = False
 	except:
 		print("Could not bind to port " + str(port) + ". Incrementing port number by one and retrying")
-		if port == 9999:
+		if port > originalPort + 1000:
 			print("Was not able to bind to a port. Exiting\n\n")
 			exit = True
 			break
@@ -67,6 +68,11 @@ def main():
 				except ConnectionResetError:
 					print("General receive exception: Connection Reset Error Handled")
 					print(str(usernames[s] + b" unexpectedly disconnected")[2:-1])
+					userSignoff(s)
+					break
+				except ConnectionAbortedError:
+					print("General receive exception: Connection Aborted Error Handled")
+					print(str(usernames[s] + b"'s connection was aborted")[2:-1])
 					userSignoff(s)
 					break
 					
