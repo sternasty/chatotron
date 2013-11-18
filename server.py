@@ -1,6 +1,18 @@
 import socket
 import select
 import sys
+import threading
+import queue
+
+queue = queue.Queue()
+
+class End(threading.Thread):
+	def run(self):
+		while queue.empty():
+			endOfProgram = input()
+			print("End of Program: " + endOfProgram)
+			if endOfProgram == "y":
+				queue.put('Blorg')
 
 #host determines who can connect to server. port determines what channel to listen on
 host = ''
@@ -8,7 +20,6 @@ port = 32401
 originalPort = port
 
 #variable to control "listening" loop execution
-running = True
 notBound = True
 exit = False
 
@@ -38,14 +49,16 @@ usernames = {}
 #the above lines partially accomplish user story "manage connections"
 
 def main():
-
+	ender = End()
+	ender.start()
+	running = True
 	while running:
 		
 		try:
 			read,write,excepts = select.select(connections,connections,[])      #select.select() returns three lists, one of sockets ready to be read, one of sockets ready to be written
 		except:
 			print("Select line exception")
-		
+			
 		for s in read:                                                          #for all sockets who have something to say	
 			if s == server:                                                     #if the socket is the server, that means there's a new connection
 				try:
@@ -89,7 +102,13 @@ def main():
 				else:
 					s.send(b'\\')
 					userSignoff(s)
-
+		if queue.empty() == False:
+			running = False
+	for s in connections:
+		if s != server:
+			s.send(b'\\')
+			del usernames[s]
+			connections.remove(s)
 	server.close()
 	print("done")
 			
